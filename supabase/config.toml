@@ -1,0 +1,8 @@
+project_id = "b2b-zw"
+
+[api]
+schemas = ["public"]
+
+# Called by the payment rail and by cron, not by app users: auth is HMAC / CRON_SECRET.
+[functions.escrow-settlement]
+verify_jwt = false

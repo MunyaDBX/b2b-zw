@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "B2B ZW",
+    "slug": "b2b-zw",
+    "scheme": "b2bzw",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-asset",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
