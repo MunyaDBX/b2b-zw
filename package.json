@@ -10,7 +10,8 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "db:types": "python3 scripts/gen-db-types.py \"${DATABASE_URL:-postgresql://postgres:postgres@127.0.0.1:54322/postgres}\" > src/types/database.ts",
-    "test:db": "bash supabase/tests/run.sh"
+    "test:db": "bash supabase/tests/run.sh",
+    "seed": "node scripts/seed-test-accounts.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
