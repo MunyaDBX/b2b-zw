@@ -26,6 +26,44 @@ export function useAddMember(companyId: string | null) {
   });
 }
 
+export function useChangeRole(companyId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (a: { memberId: string; role: CompanyRole }) => {
+      // RLS: admins only. The keep_one_admin trigger blocks demoting the last admin.
+      const { error } = await supabase.from('company_users').update({ role: a.role }).eq('id', a.memberId);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['company', companyId] });
+      void qc.invalidateQueries({ queryKey: ['memberships'] });
+    },
+  });
+}
+
+export function useCompany(companyId: string | null) {
+  return useQuery({
+    queryKey: ['company', companyId, 'profile'],
+    enabled: !!companyId,
+    queryFn: async () => unwrap(await supabase.from('companies').select('*').eq('id', companyId!).single()),
+  });
+}
+
+export function useUpdateCompany(companyId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (a: { company_name: string; vat_tax_id: string | null; whatsapp_business_number: string | null }) => {
+      // Only these columns are granted to clients; verification and credit stay platform-controlled.
+      const { error } = await supabase.from('companies').update(a).eq('id', companyId!);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['company', companyId] });
+      void qc.invalidateQueries({ queryKey: ['memberships'] });
+    },
+  });
+}
+
 export function useRemoveMember(companyId: string | null) {
   const qc = useQueryClient();
   return useMutation({

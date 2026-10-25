@@ -1187,6 +1187,7 @@ export type Database = {
       create_company: { Args: { p_name: string; p_registration_number: string; p_type: Database["public"]["Enums"]["company_type_enum"]; p_vat_tax_id?: string; p_head_office_city?: string }; Returns: string };
       create_listing: { Args: { p_company: string; p_listing: Json; p_details?: Json; p_submit?: boolean }; Returns: Json };
       decide_approval: { Args: { p_request: string; p_approve: boolean; p_note?: string }; Returns: Database["public"]["Enums"]["approval_status_enum"] };
+      delete_my_account: { Args: Record<PropertyKey, never>; Returns: undefined };
       get_listing_details: { Args: { p_listing: string }; Returns: Json };
       has_company_role: { Args: { cid: string; roles: Database["public"]["Enums"]["company_role_enum"][] }; Returns: boolean };
       is_company_member: { Args: { cid: string }; Returns: boolean };

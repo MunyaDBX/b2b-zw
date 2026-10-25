@@ -11,7 +11,8 @@ import { useSessionStore } from '@/stores/session';
 
 function RootNavigator() {
   useAuthBootstrap();
-  const { initialized, session } = useSessionStore();
+  const { initialized, session, recovering } = useSessionStore();
+  const signedIn = !!session && !recovering;
 
   if (!initialized) {
     return (
@@ -25,11 +26,12 @@ function RootNavigator() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
-      <Stack.Protected guard={!!session}>
+      <Stack.Protected guard={signedIn}>
         <Stack.Screen name="(app)" />
       </Stack.Protected>
-      <Stack.Protected guard={!session}>
+      <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="(auth)/sign-in" />
+        <Stack.Screen name="(auth)/forgot-password" />
       </Stack.Protected>
     </Stack>
   );

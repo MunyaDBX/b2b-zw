@@ -11,6 +11,7 @@ export default function AppLayout() {
       <Stack.Screen name="finance/review" options={{ title: 'Operator review' }} />
       <Stack.Screen name="company/commute" options={{ title: 'Commute routes' }} />
       <Stack.Screen name="onboarding" options={{ title: 'Set up your company' }} />
+      <Stack.Screen name="account" options={{ title: 'My account' }} />
     </Stack>
   );
 }

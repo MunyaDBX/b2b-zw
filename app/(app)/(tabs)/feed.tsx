@@ -1,5 +1,5 @@
 import { FlashList } from '@shopify/flash-list';
-import { Link, Redirect } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { Badge, Button, Card, Centered, Chips } from '@/components/ui';
@@ -41,7 +41,18 @@ export default function Feed() {
   const [filter, setFilter] = useState<Filter>('all');
   const feed = useListingFeed(filter === 'all' ? null : filter);
 
-  if (membershipsLoaded && memberships.length === 0) return <Redirect href="/onboarding" />;
+  if (membershipsLoaded && memberships.length === 0) {
+    return (
+      <Centered>
+        <Text className="text-center text-xl font-semibold text-slate-900 dark:text-white">Welcome to B2B ZW</Text>
+        <Text className="text-center text-slate-600 dark:text-slate-400">
+          Set up your company to post and bid. If a colleague's company already uses B2B ZW, ask their admin to add you instead.
+        </Text>
+        <Button title="Set up your company" onPress={() => router.push('/onboarding')} />
+        <Button title="Account settings" variant="secondary" onPress={() => router.push('/account')} />
+      </Centered>
+    );
+  }
 
   return (
     <View className="flex-1 bg-slate-50 dark:bg-slate-950">

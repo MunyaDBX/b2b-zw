@@ -20,6 +20,18 @@ npm start
 | `npm run test:db` | Throwaway Postgres → stub + migrations → 47 security and workflow assertions |
 | `npm run db:types` | Catalog-driven type generation (`scripts/gen-db-types.py`; needs only `psql`, not Docker). Set `DATABASE_URL` to point elsewhere. |
 
+## Password reset email (one-time setup)
+
+The app resets passwords with a code the user types in, so no deep links are needed. Supabase's default email contains only a link, so add the code to it:
+
+1. Supabase dashboard → **Authentication → Emails → Reset Password**.
+2. Add this line to the message body and save:
+   ```
+   <p>Your reset code: <strong>{{ .Token }}</strong></p>
+   ```
+
+Supabase's built-in email sender is rate-limited to a few emails per hour. For real users, add your own SMTP server under **Authentication → Emails → SMTP Settings**.
+
 ## Architecture
 
 ```

@@ -15,6 +15,12 @@ interface SessionState {
   /** False until the first memberships fetch completes — distinguishes "loading" from "no company". */
   membershipsLoaded: boolean;
   activeCompanyId: string | null;
+  /**
+   * True while a password reset is in progress. Verifying the reset code signs the user in,
+   * and this keeps the root guard on the reset screen until the new password is saved.
+   */
+  recovering: boolean;
+  setRecovering: (r: boolean) => void;
   setSession: (s: Session | null) => void;
   setMemberships: (m: Membership[]) => void;
   setActiveCompany: (id: string) => void;
@@ -26,6 +32,8 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   memberships: [],
   membershipsLoaded: false,
   activeCompanyId: null,
+  recovering: false,
+  setRecovering: (recovering) => set({ recovering }),
   setSession: (session) =>
     set(session ? { session, initialized: true } : { session, initialized: true, memberships: [], membershipsLoaded: false, activeCompanyId: null }),
   setMemberships: (memberships) => {
