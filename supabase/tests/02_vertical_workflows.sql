@@ -15,6 +15,8 @@ SELECT pg_temp.as_user(:a);
 SELECT create_company('Buyer Mining', 'R-0001', 'buyer') AS buyer \gset
 SELECT add_company_member(:'buyer', 'F@BUYER.ZW', 'finance_approver');
 SELECT add_company_member(:'buyer', 'a2@buyer.zw', 'admin');
+-- Policy: budgets over 1,000 need finance; asset auctions always need sign-off.
+UPDATE companies SET finance_approval_threshold = 1000, approval_required_types = '{asset_auction}' WHERE id = :'buyer';
 SELECT pg_temp.ok((SELECT count(*) FROM list_company_members(:'buyer')) = 3, 'members listed with emails (case-insensitive add)');
 SELECT pg_temp.fails(format($q$SELECT add_company_member(%L, 'nobody@x.zw', 'driver')$q$, :'buyer'),
                      'cannot add unknown email', '%sign up first%');
@@ -34,7 +36,7 @@ SELECT create_listing(:'buyer',
   jsonb_build_object('origin_address', 'Harare', 'destination_address', 'Beira', 'cargo_type', 'heavy_machinery',
                      'required_truck_type', '30ton_flatbed', 'cargo_weight_tonnes', 28, 'dispatch_status', 'delivered')) AS res \gset
 SELECT (:'res'::jsonb) ->> 'id' AS fl \gset
-SELECT pg_temp.ok((:'res'::jsonb) ->> 'approval_status' = 'pending_approval', 'escrow terms require finance approval');
+SELECT pg_temp.ok((:'res'::jsonb) ->> 'approval_status' = 'pending_approval', 'budget over the company threshold requires finance approval');
 SELECT pg_temp.ok(get_listing_details(:'fl') ->> 'dispatch_status' = 'posted', 'workflow columns cannot be set at creation');
 SELECT pg_temp.fails(format($q$SELECT create_listing(%L, '{"title":"x y z","category":"c","listing_type":"freight_haulage"}')$q$, :'buyer'),
                      'detail-backed listings require details', '%require details%');

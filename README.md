@@ -63,10 +63,9 @@ The form, validation and detail view follow automatically.
 All rules are enforced in Postgres. The app's `hasRole()` only decides what to show.
 
 - **Tenancy:** every table has RLS. Helpers (`is_company_member`, `has_company_role`) are `SECURITY DEFINER` with an empty `search_path`. `admin` implies every role.
-- **Listings:** created as `draft` through `create_listing()`, which inserts the listing and its details atomically and strips any workflow fields the client sends. `submit_listing_for_approval()` builds the steps:
-  - procurement review, unless the submitter is procurement
-  - finance sign-off when the budget is above the company threshold or terms are escrow
-  - admin sign-off for asset disposals
+- **Listings:** created as `draft` through `create_listing()`, which inserts the listing and its details atomically and strips any workflow fields the client sends. `submit_listing_for_approval()` applies the company's opt-in **approval rules**, which admins set on the Company tab. With no rules, posts go live immediately. Otherwise:
+  - post types in `approval_required_types` need a procurement officer or admin (not the author)
+  - budgets above `finance_approval_threshold` (if set) also need a finance approver
 - **Approvals:** `decide_approval()` enforces step order and segregation of duties. Nobody approves their own listing.
 - **Sealed bids:** a vendor sees only its own proposal. The buyer sees only a count (`rfq_bid_count`) until close, then all proposals. Bids lock at close. One winner per listing (partial unique index).
 - **Auctions:** bids must rise and the seller cannot bid. Bids on a listing are processed one at a time under a row lock. The reserve lives in `listing_reserves`, which only the seller can read; bidders see only `auction_reserve_met()`.

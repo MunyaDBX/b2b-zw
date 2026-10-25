@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase, unwrap } from '@/lib/supabase';
-import type { BranchRow, CommuteRouteRow, CompanyRole } from '@/types/models';
+import type { BranchRow, CommuteRouteRow, CompanyRole, ListingType } from '@/types/models';
 
 export function useMembers(companyId: string | null) {
   return useQuery({
@@ -61,6 +61,19 @@ export function useUpdateCompany(companyId: string | null) {
       void qc.invalidateQueries({ queryKey: ['company', companyId] });
       void qc.invalidateQueries({ queryKey: ['memberships'] });
     },
+  });
+}
+
+export function useUpdateApprovalRules(companyId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (a: { approval_required_types: ListingType[]; finance_approval_threshold: number | null }) => {
+      // Admin-only via RLS; a non-admin's update matches zero rows, so check the result.
+      const { data, error } = await supabase.from('companies').update(a).eq('id', companyId!).select('id');
+      if (error) throw new Error(error.message);
+      if (!data?.length) throw new Error('Only company admins can change approval rules.');
+    },
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['company', companyId] }),
   });
 }
 

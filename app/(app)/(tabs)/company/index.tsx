@@ -13,6 +13,7 @@ import {
   useRemoveMember,
   useUpdateCompany,
 } from '@/features/company/api';
+import { ApprovalRules } from '@/features/company/ApprovalRules';
 import { supabase } from '@/lib/supabase';
 import { hasRole, useActiveMembership, useSessionStore } from '@/stores/session';
 import type { CompanyRole } from '@/types/models';
@@ -248,6 +249,7 @@ export default function Company() {
       ) : null}
       <CompanyProfile companyId={membership.companyId} isAdmin={isAdmin} />
       <Members companyId={membership.companyId} isAdmin={isAdmin} myUserId={session?.user.id} />
+      {isAdmin ? <ApprovalRules companyId={membership.companyId} /> : null}
       <Branches companyId={membership.companyId} isAdmin={isAdmin} />
       {hasRole(membership, 'logistics_manager') ? (
         <Button variant="secondary" title="Employee commute routes" onPress={() => router.push('/company/commute')} />

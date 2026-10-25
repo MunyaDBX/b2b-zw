@@ -10,6 +10,16 @@ SELECT pg_temp.as_user(:a);
 SELECT create_company('Buyer Mining', 'REG-1', 'buyer') AS buyer \gset
 SELECT add_company_member(:'buyer', 'po@buyer.zw', 'procurement_officer');
 SELECT add_company_member(:'buyer', 'fin@buyer.zw', 'finance_approver');
+
+-- Approvals are opt-in: with no rules, a post goes live immediately.
+SELECT pg_temp.ok((create_listing(:'buyer', jsonb_build_object('title', 'No rules yet', 'category', 'c', 'listing_type', 'rfq_procurement',
+  'budget_or_target_price', 999999, 'bidding_closes_at', now() + interval '1 day')) ->> 'approval_status') = 'approved',
+  'no approval rules: posts publish immediately');
+SELECT pg_temp.as_user(:po);
+SELECT pg_temp.affects_none(format($q$UPDATE companies SET finance_approval_threshold = 1 WHERE id = %L$q$, :'buyer'),
+                            'only admins can change approval rules');
+SELECT pg_temp.as_user(:a);
+UPDATE companies SET finance_approval_threshold = 5000 WHERE id = :'buyer';
 SELECT pg_temp.as_user(:ven);
 SELECT create_company('Vendor Supplies', 'REG-2', 'supplier') AS vendor \gset
 

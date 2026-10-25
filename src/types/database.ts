@@ -387,11 +387,12 @@ export type Database = {
           vat_tax_id: string | null;
           company_type: Database["public"]["Enums"]["company_type_enum"];
           credit_limit: number;
-          finance_approval_threshold: number;
+          finance_approval_threshold: number | null;
           is_verified: boolean;
           whatsapp_business_number: string | null;
           created_at: string;
           is_registered: boolean;
+          approval_required_types: Database["public"]["Enums"]["b2b_listing_type"][];
         };
         Insert: {
           id?: string;
@@ -400,11 +401,12 @@ export type Database = {
           vat_tax_id?: string | null;
           company_type: Database["public"]["Enums"]["company_type_enum"];
           credit_limit?: number;
-          finance_approval_threshold?: number;
+          finance_approval_threshold?: number | null;
           is_verified?: boolean;
           whatsapp_business_number?: string | null;
           created_at?: string;
           is_registered?: boolean;
+          approval_required_types?: Database["public"]["Enums"]["b2b_listing_type"][];
         };
         Update: {
           id?: string;
@@ -413,11 +415,12 @@ export type Database = {
           vat_tax_id?: string | null;
           company_type?: Database["public"]["Enums"]["company_type_enum"];
           credit_limit?: number;
-          finance_approval_threshold?: number;
+          finance_approval_threshold?: number | null;
           is_verified?: boolean;
           whatsapp_business_number?: string | null;
           created_at?: string;
           is_registered?: boolean;
+          approval_required_types?: Database["public"]["Enums"]["b2b_listing_type"][];
         };
       Relationships: [
           ];

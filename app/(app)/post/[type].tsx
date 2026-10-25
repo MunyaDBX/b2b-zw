@@ -157,7 +157,7 @@ function ListingForm({ vertical }: { vertical: Vertical }) {
       <FormField control={control} name="contactEmail" label="Email" autoCapitalize="none" keyboardType="email-address" />
       <FormField control={control} name="contactAddress" label="Address" placeholder="Stand 12, Msasa Industrial, Harare" multiline />
       <Text className="text-xs text-slate-500">
-        Listings above your company's approval threshold, on escrow terms, or disposing of assets need sign-off before going live.
+        If your company admin has set approval rules for this type of post or budget, it goes live once approved.
       </Text>
       <Button
         title={create.isPending && files.length ? `Uploading ${files.length} file(s)…` : 'Submit'}
