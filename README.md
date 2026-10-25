@@ -2,7 +2,7 @@
 
 An industrial operating system for procurement, auctions, freight, plant hire, storage, agri off-take and trade finance.
 
-Stack: Expo SDK 52 (Router v4) · TypeScript strict · NativeWind v4 · Supabase · TanStack Query v5 · Zustand · React Hook Form + Zod.
+Stack: Expo SDK 58 · TypeScript strict · NativeWind v4 · Supabase · TanStack Query v5 · Zustand · React Hook Form + Zod.
 
 ## Quick start
 

@@ -61,7 +61,6 @@ export default function Feed() {
         <FlashList
           data={feed.data}
           keyExtractor={(l) => l.id}
-          estimatedItemSize={120}
           renderItem={({ item }) => <ListingCard item={item} />}
           refreshControl={<RefreshControl refreshing={feed.isRefetching} onRefresh={() => void feed.refetch()} />}
           ListEmptyComponent={<Text className="p-8 text-center text-slate-500">No open listings yet.</Text>}

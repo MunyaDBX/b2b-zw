@@ -1,12 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Redirect } from 'expo-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 import { z } from 'zod';
 import { Button, FormField } from '@/components/ui';
 import { supabase } from '@/lib/supabase';
-import { useSessionStore } from '@/stores/session';
 
 const schema = z.object({
   email: z.string().trim().email('Enter a valid work email'),
@@ -15,15 +13,12 @@ const schema = z.object({
 type Values = z.infer<typeof schema>;
 
 export default function SignIn() {
-  const session = useSessionStore((s) => s.session);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<'signIn' | 'signUp'>('signIn');
   const { control, handleSubmit, formState } = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: { email: '', password: '' },
   });
-
-  if (session) return <Redirect href="/feed" />;
 
   const submit = handleSubmit(async ({ email, password }) => {
     setError(null);

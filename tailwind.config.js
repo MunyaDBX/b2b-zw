@@ -2,6 +2,8 @@
 module.exports = {
   content: ['./app/**/*.{ts,tsx}', './src/**/*.{ts,tsx}'],
   presets: [require('nativewind/preset')],
+  // 'class' lets the navigation library set the scheme; on iOS/Android NativeWind still follows the system setting.
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {

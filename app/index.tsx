@@ -1,16 +1,6 @@
 import { Redirect } from 'expo-router';
-import { ActivityIndicator } from 'react-native';
-import { Centered } from '@/components/ui';
-import { useSessionStore } from '@/stores/session';
 
+// "/" → feed. If signed out, the root guard sends this on to sign-in.
 export default function Entry() {
-  const { initialized, session } = useSessionStore();
-  if (!initialized) {
-    return (
-      <Centered>
-        <ActivityIndicator />
-      </Centered>
-    );
-  }
-  return <Redirect href={session ? '/feed' : '/sign-in'} />;
+  return <Redirect href="/feed" />;
 }

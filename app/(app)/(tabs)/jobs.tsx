@@ -43,7 +43,6 @@ export default function Jobs() {
       <FlashList
         data={jobs.data ?? []}
         keyExtractor={(j) => j.id}
-        estimatedItemSize={120}
         renderItem={({ item }) => <JobCard job={item} />}
         onRefresh={() => void jobs.refetch()}
         refreshing={jobs.isRefetching}

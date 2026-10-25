@@ -67,7 +67,6 @@ export default function Approvals() {
       <FlashList
         data={inbox.data ?? []}
         keyExtractor={(a) => a.id}
-        estimatedItemSize={160}
         renderItem={({ item }) => <ApprovalItem item={item} />}
         onRefresh={() => void inbox.refetch()}
         refreshing={inbox.isRefetching}
