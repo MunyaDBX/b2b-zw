@@ -1,6 +1,9 @@
 import { Redirect } from 'expo-router';
+import { useSessionStore } from '@/stores/session';
 
-// "/" → feed. If signed out, the root guard sends this on to sign-in.
+// "/" must pick a destination the root guard allows; redirecting a signed-out
+// user to /feed loops, because the guard sends them straight back here.
 export default function Entry() {
-  return <Redirect href="/feed" />;
+  const session = useSessionStore((s) => s.session);
+  return <Redirect href={session ? '/feed' : '/sign-in'} />;
 }

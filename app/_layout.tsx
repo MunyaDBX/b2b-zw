@@ -24,6 +24,7 @@ function RootNavigator() {
   // Guards redirect automatically: signed-out users land on sign-in, signed-in users never see it.
   return (
     <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" />
       <Stack.Protected guard={!!session}>
         <Stack.Screen name="(app)" />
       </Stack.Protected>
