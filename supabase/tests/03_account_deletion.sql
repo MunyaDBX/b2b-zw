@@ -6,7 +6,7 @@ INSERT INTO auth.users(id, email) VALUES (:solo, 'solo@x.zw'), (:boss, 'boss@y.z
 SET ROLE authenticated;
 
 SELECT pg_temp.as_user(:solo);
-SELECT create_company('Solo Traders', 'S1', 'supplier') AS solo_co \gset
+SELECT create_company('Solo Traders', 'S-0001', 'supplier') AS solo_co \gset
 SELECT delete_my_account();
 RESET ROLE;
 SELECT pg_temp.ok(NOT EXISTS (SELECT 1 FROM auth.users WHERE id = :solo), 'user deleted');
@@ -15,7 +15,7 @@ SELECT pg_temp.ok(EXISTS (SELECT 1 FROM system_audit_logs WHERE action_type = 'a
 
 SET ROLE authenticated;
 SELECT pg_temp.as_user(:boss);
-SELECT create_company('Shared Logistics', 'S2', 'logistics_provider') AS shared_co \gset
+SELECT create_company('Shared Logistics', 'S-0002', 'logistics_provider') AS shared_co \gset
 SELECT add_company_member(:'shared_co', 'staff@y.zw', 'driver');
 SELECT pg_temp.fails('SELECT delete_my_account()', 'last admin of a shared company cannot leave', '%only admin of Shared Logistics%');
 

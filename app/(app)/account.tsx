@@ -2,8 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Alert, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, Text, TextInput, View } from 'react-native';
 import { z } from 'zod';
+import { FormScreen } from '@/components/FormScreen';
 import { Button, Card, FormField, Row, SectionTitle } from '@/components/ui';
 import { emailRule, passwordRule } from '@/features/auth/schemas';
 import { supabase } from '@/lib/supabase';
@@ -153,11 +154,11 @@ function DangerZone() {
 
 export default function Account() {
   return (
-    <ScrollView contentContainerClassName="gap-4 p-4 pb-16" className="bg-slate-50 dark:bg-slate-950" keyboardShouldPersistTaps="handled">
+    <FormScreen className="gap-4 p-4 pb-24">
       <Profile />
       <ChangeEmail />
       <ChangePassword />
       <DangerZone />
-    </ScrollView>
+    </FormScreen>
   );
 }

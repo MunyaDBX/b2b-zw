@@ -1,14 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Redirect, Stack, router, useLocalSearchParams } from 'expo-router';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm, type Resolver } from 'react-hook-form';
-import { Alert, ScrollView, Text } from 'react-native';
+import { Alert, Text } from 'react-native';
 import { z } from 'zod';
+import { FormScreen } from '@/components/FormScreen';
 import { Button, ChipsField, FormField, SectionTitle } from '@/components/ui';
+import { emailRule } from '@/features/auth/schemas';
+import { AttachmentPicker } from '@/features/listings/AttachmentPicker';
 import { DynamicField } from '@/features/listings/DynamicField';
 import { useCreateListing } from '@/features/listings/api';
 import { VERTICALS, detailDefaults, detailsSchema, type Vertical } from '@/features/listings/verticals';
 import { E164 } from '@/features/rfq/schemas';
+import type { LocalFile } from '@/lib/uploads';
 import { useSessionStore } from '@/stores/session';
 import type { ListingType } from '@/types/models';
 
@@ -27,6 +31,7 @@ const TERMS = [
 
 const blank = (v: unknown) => (v === '' || v === null ? undefined : v);
 const optionalMoney = z.preprocess(blank, z.coerce.number().positive('Must be greater than 0').optional());
+const phone = z.string().trim().regex(E164, 'Use international format, e.g. +263771234567').optional().or(z.literal(''));
 
 function listingSchema(v: Vertical) {
   const days = z.coerce.number().int().min(1, 'Minimum 1 day').max(60, 'Maximum 60 days');
@@ -40,7 +45,11 @@ function listingSchema(v: Vertical) {
     paymentTerms: z.enum(['immediate', 'net_15', 'net_30', 'net_60', 'escrow']),
     deliveryLocation: z.string().trim().max(300).optional(),
     biddingDays: v.biddingRequired ? z.preprocess(blank, days) : z.preprocess(blank, days.optional()),
-    whatsapp: z.string().trim().regex(E164, 'Use international format, e.g. +263771234567').optional().or(z.literal('')),
+    whatsapp: phone,
+    contactPerson: z.string().trim().max(120).optional(),
+    contactPhone: phone,
+    contactEmail: emailRule.optional().or(z.literal('')),
+    contactAddress: z.string().trim().max(300).optional(),
     details: detailsSchema(v),
   });
 }
@@ -48,8 +57,11 @@ type FormValues = z.output<ReturnType<typeof listingSchema>> & { details: Record
 
 function ListingForm({ vertical }: { vertical: Vertical }) {
   const companyId = useSessionStore((s) => s.activeCompanyId);
-  const create = useCreateListing(companyId);
+  const user = useSessionStore((s) => s.session?.user);
+  const create = useCreateListing(companyId, user?.id);
+  const [files, setFiles] = useState<LocalFile[]>([]);
   const schema = useMemo(() => listingSchema(vertical), [vertical]);
+  const meta = (user?.user_metadata ?? {}) as { full_name?: string; phone?: string };
   const { control, handleSubmit } = useForm<FormValues>({
     resolver: zodResolver(schema) as unknown as Resolver<FormValues>,
     defaultValues: {
@@ -58,7 +70,12 @@ function ListingForm({ vertical }: { vertical: Vertical }) {
       currency: 'USD',
       paymentTerms: vertical.postedBy === 'buyer' ? 'net_30' : 'immediate',
       biddingDays: vertical.biddingRequired ? 7 : undefined,
-      whatsapp: '',
+      whatsapp: meta.phone ?? '',
+      // Prefill enquiry contacts from the user's profile; editable per listing.
+      contactPerson: meta.full_name ?? '',
+      contactPhone: meta.phone ?? '',
+      contactEmail: user?.email ?? '',
+      contactAddress: '',
       details: detailDefaults(vertical),
     },
   });
@@ -78,15 +95,22 @@ function ListingForm({ vertical }: { vertical: Vertical }) {
           payment_terms: v.paymentTerms,
           delivery_location: v.deliveryLocation || undefined,
           whatsapp_business_number: v.whatsapp || undefined,
+          contact_person: v.contactPerson || undefined,
+          contact_phone: v.contactPhone || undefined,
+          contact_email: v.contactEmail || undefined,
+          contact_address: v.contactAddress || undefined,
           bidding_closes_at: vertical.bidding === 'none' ? undefined : closes,
         },
         details: vertical.fields.length ? v.details : undefined,
+        files,
       },
       {
-        onSuccess: ({ id, approval_status }) => {
+        onSuccess: ({ id, approval_status, failedUploads }) => {
+          const live = approval_status === 'approved';
           Alert.alert(
-            approval_status === 'approved' ? 'Published' : 'Sent for approval',
-            approval_status === 'approved' ? 'Your listing is live.' : 'It goes live once all approvers sign off.',
+            live ? 'Published' : 'Sent for approval',
+            (live ? 'Your listing is live.' : 'It goes live once all approvers sign off.') +
+              (failedUploads.length ? `\n\nThese files did not upload: ${failedUploads.join(', ')}.` : ''),
           );
           router.replace({ pathname: '/listing/[id]', params: { id } });
         },
@@ -96,7 +120,7 @@ function ListingForm({ vertical }: { vertical: Vertical }) {
   });
 
   return (
-    <ScrollView contentContainerClassName="gap-4 p-4 pb-16" keyboardShouldPersistTaps="handled">
+    <FormScreen>
       <Text className="text-slate-600 dark:text-slate-400">{vertical.blurb}</Text>
       <FormField control={control} name="title" label="Title" placeholder="Short, specific headline" />
       <FormField control={control} name="category" label="Category" />
@@ -123,12 +147,24 @@ function ListingForm({ vertical }: { vertical: Vertical }) {
           keyboardType="number-pad"
         />
       ) : null}
-      <FormField control={control} name="whatsapp" label="WhatsApp for enquiries (optional)" placeholder="+263771234567" keyboardType="phone-pad" />
+
+      <AttachmentPicker files={files} onChange={setFiles} />
+
+      <SectionTitle>Contact for enquiries</SectionTitle>
+      <FormField control={control} name="contactPerson" label="Contact person" autoComplete="name" />
+      <FormField control={control} name="whatsapp" label="WhatsApp" placeholder="+263771234567" keyboardType="phone-pad" />
+      <FormField control={control} name="contactPhone" label="Phone (calls)" placeholder="+263242123456" keyboardType="phone-pad" />
+      <FormField control={control} name="contactEmail" label="Email" autoCapitalize="none" keyboardType="email-address" />
+      <FormField control={control} name="contactAddress" label="Address" placeholder="Stand 12, Msasa Industrial, Harare" multiline />
       <Text className="text-xs text-slate-500">
         Listings above your company's approval threshold, on escrow terms, or disposing of assets need sign-off before going live.
       </Text>
-      <Button title="Submit" onPress={submit} loading={create.isPending} />
-    </ScrollView>
+      <Button
+        title={create.isPending && files.length ? `Uploading ${files.length} file(s)…` : 'Submit'}
+        onPress={submit}
+        loading={create.isPending}
+      />
+    </FormScreen>
   );
 }
 

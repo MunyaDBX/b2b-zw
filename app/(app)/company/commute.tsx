@@ -1,8 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Bus } from 'lucide-react-native';
 import { useForm } from 'react-hook-form';
-import { Alert, ScrollView, Switch, Text, View } from 'react-native';
+import { Alert, Switch, Text, View } from 'react-native';
 import { z } from 'zod';
+import { FormScreen } from '@/components/FormScreen';
 import { Button, Card, FormField, SectionTitle } from '@/components/ui';
 import { useAddCommuteRoute, useCommuteRoutes, useToggleRoute } from '@/features/company/api';
 import { useSessionStore } from '@/stores/session';
@@ -37,7 +38,7 @@ export default function Commute() {
   );
 
   return (
-    <ScrollView contentContainerClassName="gap-4 p-4 pb-16" keyboardShouldPersistTaps="handled">
+    <FormScreen className="gap-4 p-4 pb-24">
       {routes.data?.map((r) => {
         const stops = Array.isArray(r.stops) ? (r.stops as { name?: string }[]).map((s) => s.name).filter(Boolean) : [];
         return (
@@ -66,6 +67,6 @@ export default function Commute() {
           <Button title="Add route" onPress={submit} loading={add.isPending} />
         </View>
       </Card>
-    </ScrollView>
+    </FormScreen>
   );
 }

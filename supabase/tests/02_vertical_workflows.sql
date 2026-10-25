@@ -12,14 +12,14 @@ SET ROLE authenticated;
 
 -- Membership ----------------------------------------------------------------------
 SELECT pg_temp.as_user(:a);
-SELECT create_company('Buyer Mining', 'R1', 'buyer') AS buyer \gset
+SELECT create_company('Buyer Mining', 'R-0001', 'buyer') AS buyer \gset
 SELECT add_company_member(:'buyer', 'F@BUYER.ZW', 'finance_approver');
 SELECT add_company_member(:'buyer', 'a2@buyer.zw', 'admin');
 SELECT pg_temp.ok((SELECT count(*) FROM list_company_members(:'buyer')) = 3, 'members listed with emails (case-insensitive add)');
 SELECT pg_temp.fails(format($q$SELECT add_company_member(%L, 'nobody@x.zw', 'driver')$q$, :'buyer'),
                      'cannot add unknown email', '%sign up first%');
 SELECT pg_temp.as_user(:car);
-SELECT create_company('Carrier Haulage', 'R2', 'logistics_provider') AS carrier \gset
+SELECT create_company('Carrier Haulage', 'R-0002', 'logistics_provider') AS carrier \gset
 SELECT add_company_member(:'carrier', 'driver@carrier.zw', 'driver');
 SELECT pg_temp.fails(format($q$UPDATE company_users SET role = 'driver' WHERE company_id = %L AND user_id = auth.uid()$q$, :'carrier'),
                      'last admin cannot be demoted', '%at least one admin%');

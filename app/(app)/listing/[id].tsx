@@ -1,14 +1,15 @@
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
+import { FormScreen } from '@/components/FormScreen';
 import { Badge, Card, Centered, Row } from '@/components/ui';
 import { AuctionPanel } from '@/features/listings/panels/AuctionPanel';
 import { DetailsCard } from '@/features/listings/panels/DetailsCard';
 import { EscrowPanel } from '@/features/listings/panels/EscrowPanel';
 import { FreightPanel } from '@/features/listings/panels/FreightPanel';
+import { ContactCard, MediaGallery } from '@/features/listings/panels/MediaAndContact';
 import { SealedBiddingPanel } from '@/features/listings/panels/SealedBiddingPanel';
 import { VERTICALS } from '@/features/listings/verticals';
 import { useListing } from '@/features/rfq/api';
-import { WhatsAppQuoteButton } from '@/features/whatsapp/WhatsAppQuoteButton';
 import { formatMoney, timeLeft } from '@/lib/format';
 import { useActiveMembership } from '@/stores/session';
 
@@ -42,7 +43,8 @@ export default function ListingDetail() {
   return (
     <>
       <Stack.Screen options={{ title: v.label }} />
-      <ScrollView contentContainerClassName="gap-4 p-4 pb-16" className="bg-slate-50 dark:bg-slate-950">
+      <FormScreen>
+        <MediaGallery listingId={l.id} show="photos" />
         <View className="flex-row flex-wrap gap-2">
           <Badge label={l.approval_status.replace('_', ' ')} tone={APPROVAL_TONE[l.approval_status]} />
           <Badge label={l.status} />
@@ -58,16 +60,15 @@ export default function ListingDetail() {
           {l.description ? <Text className="mt-2 text-slate-600 dark:text-slate-400">{l.description}</Text> : null}
         </Card>
 
+        <MediaGallery listingId={l.id} show="documents" />
         <DetailsCard listingId={l.id} vertical={v} />
         {v.bidding === 'auction' ? <AuctionPanel listing={l} isOwner={isOwner} /> : null}
         {showSealed ? <SealedBiddingPanel listing={l} vertical={v} isOwner={isOwner} /> : null}
         {l.listing_type === 'freight_haulage' && l.status === 'awarded' ? <FreightPanel listing={l} isOwner={isOwner} /> : null}
         {l.status === 'awarded' ? <EscrowPanel listing={l} isOwner={isOwner} /> : null}
 
-        {!isOwner && membership ? (
-          <WhatsAppQuoteButton phone={l.whatsapp_business_number} listing={l} senderCompany={membership.companyName} />
-        ) : null}
-      </ScrollView>
+        <ContactCard listing={l} senderCompany={membership?.companyName ?? ''} />
+      </FormScreen>
     </>
   );
 }

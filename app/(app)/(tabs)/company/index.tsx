@@ -116,7 +116,10 @@ function CompanyProfile({ companyId, isAdmin }: { companyId: string; isAdmin: bo
       <View className="gap-2">
         <View className="flex-row items-center justify-between">
           <SectionTitle>Company profile</SectionTitle>
-          <Badge label={c.is_verified ? 'Verified' : 'Unverified'} tone={c.is_verified ? 'ok' : 'warn'} />
+          <View className="flex-row gap-1">
+            {!c.is_registered ? <Badge label="Unregistered" /> : null}
+            <Badge label={c.is_verified ? 'Verified' : 'Unverified'} tone={c.is_verified ? 'ok' : 'warn'} />
+          </View>
         </View>
         {draft ? (
           <View className="gap-2">
@@ -135,7 +138,9 @@ function CompanyProfile({ companyId, isAdmin }: { companyId: string; isAdmin: bo
         ) : (
           <>
             <Text className="text-base font-semibold text-slate-900 dark:text-white">{c.company_name}</Text>
-            <Text className="text-slate-600 dark:text-slate-400">Reg. no. {c.registration_number}</Text>
+            <Text className="text-slate-600 dark:text-slate-400">
+              {c.is_registered ? 'Reg. no.' : 'Platform ref.'} {c.registration_number}
+            </Text>
             <Text className="text-slate-600 dark:text-slate-400">VAT: {c.vat_tax_id ?? '—'}</Text>
             <Text className="text-slate-600 dark:text-slate-400">WhatsApp: {c.whatsapp_business_number ?? '—'}</Text>
             {isAdmin ? (

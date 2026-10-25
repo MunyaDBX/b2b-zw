@@ -115,6 +115,7 @@ export type Database = {
           size_bytes: number | null;
           uploaded_by: string | null;
           created_at: string;
+          sort_order: number;
         };
         Insert: {
           id?: string;
@@ -126,6 +127,7 @@ export type Database = {
           size_bytes?: number | null;
           uploaded_by?: string | null;
           created_at?: string;
+          sort_order?: number;
         };
         Update: {
           id?: string;
@@ -137,6 +139,7 @@ export type Database = {
           size_bytes?: number | null;
           uploaded_by?: string | null;
           created_at?: string;
+          sort_order?: number;
         };
       Relationships: [
             {
@@ -218,6 +221,10 @@ export type Database = {
           expires_at: string | null;
           created_at: string;
           updated_at: string;
+          contact_person: string | null;
+          contact_phone: string | null;
+          contact_email: string | null;
+          contact_address: string | null;
         };
         Insert: {
           id?: string;
@@ -239,6 +246,10 @@ export type Database = {
           expires_at?: string | null;
           created_at?: string;
           updated_at?: string;
+          contact_person?: string | null;
+          contact_phone?: string | null;
+          contact_email?: string | null;
+          contact_address?: string | null;
         };
         Update: {
           id?: string;
@@ -260,6 +271,10 @@ export type Database = {
           expires_at?: string | null;
           created_at?: string;
           updated_at?: string;
+          contact_person?: string | null;
+          contact_phone?: string | null;
+          contact_email?: string | null;
+          contact_address?: string | null;
         };
       Relationships: [
             {
@@ -376,6 +391,7 @@ export type Database = {
           is_verified: boolean;
           whatsapp_business_number: string | null;
           created_at: string;
+          is_registered: boolean;
         };
         Insert: {
           id?: string;
@@ -388,6 +404,7 @@ export type Database = {
           is_verified?: boolean;
           whatsapp_business_number?: string | null;
           created_at?: string;
+          is_registered?: boolean;
         };
         Update: {
           id?: string;
@@ -400,6 +417,7 @@ export type Database = {
           is_verified?: boolean;
           whatsapp_business_number?: string | null;
           created_at?: string;
+          is_registered?: boolean;
         };
       Relationships: [
           ];

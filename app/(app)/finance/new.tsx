@@ -3,7 +3,8 @@ import { router } from 'expo-router';
 import { FileText } from 'lucide-react-native';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Alert, ScrollView, Text, View } from 'react-native';
+import { Alert, Text, View } from 'react-native';
+import { FormScreen } from '@/components/FormScreen';
 import { Button, ChipsField, FormField } from '@/components/ui';
 import { tradeFinanceSchema, useCreateTradeFinance, type TradeFinanceInput, type TradeFinanceValues } from '@/features/finance/api';
 import { pickAndUpload, type UploadedAttachment } from '@/lib/uploads';
@@ -56,7 +57,7 @@ export default function NewTradeFinance() {
   });
 
   return (
-    <ScrollView contentContainerClassName="gap-4 p-4 pb-16" keyboardShouldPersistTaps="handled">
+    <FormScreen className="gap-4 p-4 pb-24">
       <Text className="text-slate-600 dark:text-slate-400">
         Get up to 95% of an unpaid Net-30/60 invoice advanced now. The advance is settled when your debtor pays.
       </Text>
@@ -76,6 +77,6 @@ export default function NewTradeFinance() {
         ) : null}
       </View>
       <Button title="Submit for review" onPress={submit} loading={create.isPending} />
-    </ScrollView>
+    </FormScreen>
   );
 }

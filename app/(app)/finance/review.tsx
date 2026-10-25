@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Text, TextInput, View } from 'react-native';
+import { FormScreen } from '@/components/FormScreen';
 import { Badge, Button, Card, Centered, Row } from '@/components/ui';
 import { FINANCE_TONE, useIsPlatformAdmin, useReviewQueue, useReviewTradeFinance } from '@/features/finance/api';
 import { formatMoney } from '@/lib/format';
@@ -82,9 +83,9 @@ export default function Review() {
     );
   }
   return (
-    <ScrollView contentContainerClassName="gap-3 p-4 pb-16">
+    <FormScreen className="gap-3 p-4 pb-24">
       {queue.data?.map((r) => <ReviewCard key={r.id} r={r} />)}
       {queue.data?.length === 0 ? <Text className="p-6 text-center text-slate-500">Queue is empty.</Text> : null}
-    </ScrollView>
+    </FormScreen>
   );
 }

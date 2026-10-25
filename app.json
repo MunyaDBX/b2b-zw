@@ -13,7 +13,14 @@
     "plugins": [
       "expo-router",
       "expo-asset",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "B2B ZW uses your photos to attach pictures of goods, equipment and documents to your listings.",
+          "cameraPermission": "B2B ZW uses the camera to photograph goods, equipment and delivery documents."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
