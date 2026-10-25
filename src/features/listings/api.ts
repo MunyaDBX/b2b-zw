@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 import { supabase, unwrap } from '@/lib/supabase';
 import { uploadFile, type LocalFile } from '@/lib/uploads';
 import type { Json } from '@/types/database';
@@ -72,10 +72,11 @@ export function useListingDetails(listingId: string) {
 
 export function useAuctionBids(listingId: string, enabled: boolean) {
   const qc = useQueryClient();
+  const instance = useId(); // see useProposals: channel names must be unique per subscriber
   useEffect(() => {
     if (!enabled) return;
     const ch = supabase
-      .channel(`auction:${listingId}`)
+      .channel(`auction:${listingId}:${instance}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'auction_bids', filter: `listing_id=eq.${listingId}` }, () => {
         void qc.invalidateQueries({ queryKey: ['auction', listingId] });
       })
@@ -83,7 +84,7 @@ export function useAuctionBids(listingId: string, enabled: boolean) {
     return () => {
       void supabase.removeChannel(ch);
     };
-  }, [listingId, enabled, qc]);
+  }, [listingId, enabled, instance, qc]);
 
   return useQuery({
     queryKey: ['auction', listingId],

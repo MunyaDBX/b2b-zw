@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 import { queryKeys } from '@/lib/queryClient';
 import { supabase, unwrap } from '@/lib/supabase';
 import type { ApprovalRequestRow, ListingRow, ListingType, ProposalRow } from '@/types/models';
@@ -35,9 +35,12 @@ export function useListing(id: string) {
 /** RLS returns only the caller's own proposal while sealed; all proposals to the buyer after close. */
 export function useProposals(listingId: string) {
   const qc = useQueryClient();
+  // Unique per hook instance: supabase.channel() returns an already-subscribed channel
+  // for a repeated name, and adding listeners to it throws.
+  const instance = useId();
   useEffect(() => {
     const channel = supabase
-      .channel(`proposals:${listingId}`)
+      .channel(`proposals:${listingId}:${instance}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'rfq_proposals', filter: `listing_id=eq.${listingId}` },
@@ -49,7 +52,7 @@ export function useProposals(listingId: string) {
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [listingId, qc]);
+  }, [listingId, instance, qc]);
 
   return useQuery({
     queryKey: queryKeys.proposals(listingId),
